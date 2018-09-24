@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/erwannT/go-todolist/middleware"
 	"github.com/erwannT/go-todolist/task"
 
 	"github.com/gorilla/mux"
@@ -46,6 +47,8 @@ func main() {
 	}
 
 	r := mux.NewRouter()
+
+	r.Use(middleware.AuthenMiddleware)
 
 	r.HandleFunc("/health", healthHandler).Methods(http.MethodGet)
 	r.HandleFunc("/tasks", task.PostTaskHandler).Methods(http.MethodPost)
