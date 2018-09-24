@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
+	"github.com/erwannT/go-todolist/connection"
 	"github.com/erwannT/go-todolist/task"
 
 	"github.com/gorilla/mux"
@@ -22,11 +22,16 @@ type Status struct {
 
 func main() {
 
-	initGracefullyShutdown()
 	fmt.Println("Starting application")
 
 	viper.SetDefault("PORT", "8080")
+	viper.SetDefault("MYSQL_HOST", "localhost")
+	viper.SetDefault("MYSQL_PORT", "3306")
 	viper.AutomaticEnv()
+
+	connection.InitDB()
+
+	initGracefullyShutdown()
 
 	var serverPort = viper.GetString("PORT")
 
@@ -65,8 +70,8 @@ func initGracefullyShutdown() {
 	go func() {
 		sig := <-gracefulStop
 		fmt.Printf("caught sig: %+v", sig)
-		fmt.Println("Wait for 1 second to finish processing")
-		time.Sleep(1 * time.Second)
+		fmt.Println("Wait for closing DB")
+		connection.Close()
 		os.Exit(0)
 	}()
 }
